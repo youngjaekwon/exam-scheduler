@@ -59,8 +59,10 @@ INSTALLED_APPS = [
     # jwt
     "rest_framework_simplejwt",
     # apps
-    "users.apps.UsersConfig",
+    "core.apps.CoreConfig",
+    "reservations.apps.ReservationsConfig",
     "schedules.apps.SchedulesConfig",
+    "users.apps.UsersConfig",
 ]
 
 MIDDLEWARE = [

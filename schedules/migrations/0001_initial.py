@@ -4,26 +4,24 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='ExamSchedule',
+            name="ExamSchedule",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(db_index=True, max_length=255)),
-                ('description', models.TextField(blank=True)),
-                ('start_time', models.DateTimeField()),
-                ('end_time', models.DateTimeField()),
-                ('confirmed_participants', models.PositiveIntegerField(default=0)),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("title", models.CharField(db_index=True, max_length=255)),
+                ("description", models.TextField(blank=True)),
+                ("start_time", models.DateTimeField()),
+                ("end_time", models.DateTimeField()),
+                ("confirmed_participants", models.PositiveIntegerField(default=0)),
             ],
             options={
-                'ordering': ['start_time'],
-                'indexes': [models.Index(fields=['start_time', 'end_time'], name='schedules_e_start_t_2fa6dc_idx')],
+                "ordering": ["start_time"],
+                "indexes": [models.Index(fields=["start_time", "end_time"], name="schedules_e_start_t_2fa6dc_idx")],
             },
         ),
     ]

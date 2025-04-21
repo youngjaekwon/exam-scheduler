@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from pathlib import Path
 import environ
+from datetime import timedelta
 
 # Initialize environ
 env = environ.Env(
@@ -54,6 +55,8 @@ INSTALLED_APPS = [
     "rest_framework",
     # drf-spectacular
     "drf_spectacular",
+    # jwt
+    "rest_framework_simplejwt",
     # apps
     "users.apps.UsersConfig",
 ]
@@ -139,15 +142,26 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # REST Framework 설정
 REST_FRAMEWORK = {
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_AUTHENTICATION_CLASSES": ("rest_framework_simplejwt.authentication.JWTAuthentication",),
+}
+
+# JWT 설정
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=1),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ROTATE_REFRESH_TOKENS": False,
+    "BLACKLIST_AFTER_ROTATION": False,
+    "SIGNING_KEY": env("SECRET_KEY"),
+    "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
 # drf-spectacular 설정
 SPECTACULAR_SETTINGS = {
-    'TITLE': '시험 일정 예약 시스템 API',
-    'DESCRIPTION': '시험 일정 예약 시스템을 관리하기 위한 API',
-    'VERSION': '1.0.0',
-    'SERVE_INCLUDE_SCHEMA': False,
+    "TITLE": "시험 일정 예약 시스템 API",
+    "DESCRIPTION": "시험 일정 예약 시스템을 관리하기 위한 API",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
     "SECURITY": [
         {
             "BearerAuth": {
@@ -157,5 +171,5 @@ SPECTACULAR_SETTINGS = {
             }
         }
     ],
-    'COMPONENT_SPLIT_REQUEST': True,
+    "COMPONENT_SPLIT_REQUEST": True,
 }

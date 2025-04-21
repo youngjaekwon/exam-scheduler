@@ -1,9 +1,8 @@
 from django.contrib.auth import get_user_model
-from rest_framework import generics, permissions, status
-from rest_framework.response import Response
+from rest_framework import generics, permissions
 
-from users.serializers.users import UserRegisterSerializer, UserUpdateSerializer, UserMeSerializer
-from users.schemas import user_register_schema, user_me_schema, user_me_update_schema
+from users.schemas import user_me_schema, user_me_update_schema, user_register_schema
+from users.serializers.users import UserMeSerializer, UserRegisterSerializer, UserUpdateSerializer
 
 User = get_user_model()
 

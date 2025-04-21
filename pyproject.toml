@@ -5,6 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "coverage>=7.8.0",
     "django>=5.2",
     "django-environ>=0.12.0",
     "djangorestframework>=3.16.0",
@@ -60,3 +61,8 @@ skip-magic-trailing-comma = false
 line-ending = "auto"
 docstring-code-format = false
 docstring-code-line-length = "dynamic"
+
+[dependency-groups]
+dev = [
+    "ruff>=0.11.6",
+]

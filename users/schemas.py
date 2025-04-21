@@ -14,6 +14,7 @@ user_register_schema = extend_schema(
         ),
         status.HTTP_400_BAD_REQUEST: OpenApiResponse(description="유효하지 않은 입력 데이터입니다."),
     },
+    auth=[]
 )
 
 
@@ -48,6 +49,7 @@ token_obtain_schema = extend_schema(
         ),
         status.HTTP_401_UNAUTHORIZED: OpenApiResponse(description="인증에 실패했습니다."),
     },
+    auth=[]
 )
 
 
@@ -60,4 +62,5 @@ token_refresh_schema = extend_schema(
         ),
         status.HTTP_401_UNAUTHORIZED: OpenApiResponse(description="유효하지 않은 리프레시 토큰입니다."),
     },
+    auth=[],
 )

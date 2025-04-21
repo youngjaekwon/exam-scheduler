@@ -29,8 +29,9 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         user = User.objects.create_user(
             username=validated_data.get("username"),
             email=validated_data.get("email"),
-            password=validated_data.get("password"),
         )
+        user.set_password(validated_data.get("password"))
+        user.save()
 
         return user
 
@@ -42,9 +43,29 @@ class UserMeSerializer(serializers.ModelSerializer):
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, style={"input_type": "password"}, required=False)
+    password_confirm = serializers.CharField(write_only=True, style={"input_type": "password"}, required=False)
+
     class Meta:
         model = User
-        fields = ["id", "username", "email", "password"]
+        fields = ["id", "email", "password", "password_confirm"]
         extra_kwargs = {
             "id": {"read_only": True},
         }
+
+    def validate(self, data):
+        if "password" in data:
+            if not data.get("password_confirm"):
+                raise serializers.ValidationError({"password_confirm": "비밀번호 확인이 필요합니다."})
+            if data.get("password") != data.get("password_confirm"):
+                raise serializers.ValidationError({"password_confirm": "비밀번호가 일치하지 않습니다."})
+        return data
+
+    def update(self, instance, validated_data):
+        validated_data.pop("password_confirm", None)
+        password = validated_data.pop("password", None)
+        
+        if password:
+            instance.set_password(password)
+        
+        return super().update(instance, validated_data)

@@ -6,14 +6,17 @@ from rest_framework.response import Response
 
 from reservations.models import Reservation
 from reservations.permissions import IsAdminOrOwnerWithEditableCondition
+from reservations.schemas import reservation_schema_view
 from reservations.serializers import ReservationSerializer
 
 
+@reservation_schema_view
 class ReservationViewSet(viewsets.ModelViewSet):
     serializer_class = ReservationSerializer
     permission_classes = [IsAuthenticated, IsAdminOrOwnerWithEditableCondition]
     filterset_fields = ["schedule", "user", "is_confirmed"]
     ordering_fields = ["created_at", "expected_participants"]
+    search_fields = ["schedule__title"]
 
     def get_queryset(self):
         qs = Reservation.objects.select_related("user", "schedule")

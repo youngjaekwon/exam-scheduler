@@ -6,29 +6,42 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('schedules', '0001_initial'),
+        ("schedules", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Reservation',
+            name="Reservation",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('expected_participants', models.PositiveIntegerField()),
-                ('is_confirmed', models.BooleanField(default=False)),
-                ('confirmed_at', models.DateTimeField(blank=True, null=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True, db_index=True)),
-                ('schedule', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='reservations', to='schedules.examschedule')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='reservations', to=settings.AUTH_USER_MODEL)),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("expected_participants", models.PositiveIntegerField()),
+                ("is_confirmed", models.BooleanField(default=False)),
+                ("confirmed_at", models.DateTimeField(blank=True, null=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True, db_index=True)),
+                (
+                    "schedule",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="reservations",
+                        to="schedules.examschedule",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="reservations",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-created_at'],
-                'indexes': [models.Index(fields=['user', 'is_confirmed'], name='reservation_user_id_206bfe_idx')],
+                "ordering": ["-created_at"],
+                "indexes": [models.Index(fields=["user", "is_confirmed"], name="reservation_user_id_206bfe_idx")],
             },
         ),
     ]

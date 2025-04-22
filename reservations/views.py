@@ -1,4 +1,5 @@
 from django.db import transaction
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import SAFE_METHODS, IsAdminUser, IsAuthenticated
@@ -7,16 +8,20 @@ from rest_framework.response import Response
 from reservations.models import Reservation
 from reservations.permissions import IsAdminOrOwnerWithEditableCondition
 from reservations.schemas import reservation_schema_view
-from reservations.serializers import ReservationSerializer
+from reservations.serializers import ReservationSerializer, ReservationUpdateSerializer
 
 
 @reservation_schema_view
 class ReservationViewSet(viewsets.ModelViewSet):
-    serializer_class = ReservationSerializer
     permission_classes = [IsAuthenticated, IsAdminOrOwnerWithEditableCondition]
     filterset_fields = ["schedule", "user", "is_confirmed"]
     ordering_fields = ["created_at", "expected_participants"]
     search_fields = ["schedule__title"]
+
+    def get_serializer_class(self):
+        if self.request.method in ["PUT", "PATCH"]:
+            return ReservationUpdateSerializer
+        return ReservationSerializer
 
     def get_queryset(self):
         qs = Reservation.objects.select_related("user", "schedule")
@@ -28,13 +33,15 @@ class ReservationViewSet(viewsets.ModelViewSet):
     def get_object(self):
         queryset = self.filter_queryset(self.get_queryset())
 
-        if self.request.method in SAFE_METHODS:
-            obj = queryset.get(pk=self.kwargs["pk"])
-        else:
-            obj = queryset.select_for_update().get(pk=self.kwargs["pk"])
+        if self.request.method not in SAFE_METHODS:
+            queryset = queryset.select_for_update()
 
+        obj = get_object_or_404(queryset, pk=self.kwargs["pk"])
         self.check_object_permissions(self.request, obj)
         return obj
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
     @transaction.atomic
     def perform_update(self, serializer):
@@ -67,7 +74,7 @@ class ReservationViewSet(viewsets.ModelViewSet):
         try:
             reservation.confirm()
         except ValueError as e:
-            raise serializers.ValidationError({"detail": str(e)})
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = self.get_serializer(reservation)
         return Response(serializer.data, status=status.HTTP_200_OK)

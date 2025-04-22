@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.conf import settings
 from django.db import models
 
@@ -30,3 +32,15 @@ class ExamSchedule(models.Model):
         self.confirmed_participants -= participant_count
 
         self.save(update_fields=["confirmed_participants"])
+
+    def get_reservation_deadline(self):
+        """
+        시험 예약 마감 시간을 반환합니다.
+        """
+        return self.start_time - timedelta(days=settings.EXAM_RESERVATION_DEADLINE_DAYS)
+
+    def get_remaining_capacity(self):
+        """
+        현재 확정된 인원을 기준으로 남은 신청 가능 인원 수를 반환합니다.
+        """
+        return settings.EXAM_SCHEDULE_MAX_PARTICIPANTS - self.confirmed_participants

@@ -8,7 +8,7 @@ from drf_spectacular.utils import (
 )
 from rest_framework import status
 
-from reservations.serializers import ReservationSerializer
+from reservations.serializers import ReservationSerializer, ReservationUpdateSerializer
 
 reservation_create_schema = extend_schema(
     summary="예약 신청",
@@ -59,9 +59,9 @@ reservation_detail_schema = extend_schema(
 reservation_update_schema = extend_schema(
     summary="예약 수정",
     description="예약을 수정합니다.\n\n예약 수정은 확정 전 까지 가능합니다.\n\n관리자는 모든 예약을 수정할 수 있습니다.",
-    request=ReservationSerializer,
+    request=ReservationUpdateSerializer,
     responses={
-        status.HTTP_200_OK: OpenApiResponse(response=ReservationSerializer, description="예약이 수정되었습니다."),
+        status.HTTP_200_OK: OpenApiResponse(response=ReservationUpdateSerializer, description="예약이 수정되었습니다."),
         status.HTTP_400_BAD_REQUEST: OpenApiResponse(description="유효하지 않은 입력 데이터입니다."),
         status.HTTP_401_UNAUTHORIZED: OpenApiResponse(description="인증되지 않은 요청입니다."),
         status.HTTP_403_FORBIDDEN: OpenApiResponse(description="권한이 없습니다."),

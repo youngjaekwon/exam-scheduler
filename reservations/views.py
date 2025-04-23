@@ -55,7 +55,6 @@ class ReservationViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
-    @transaction.atomic
     def perform_update(self, serializer):
         reservation = serializer.instance
         new_expected_participants = serializer.validated_data.get(
@@ -71,12 +70,19 @@ class ReservationViewSet(viewsets.ModelViewSet):
         super().perform_update(serializer)
 
     @transaction.atomic
+    def update(self, request, *args, **kwargs):
+        return super().update(request, *args, **kwargs)
+
     def perform_destroy(self, reservation):
         try:
             reservation.cancel()
             super().perform_destroy(reservation)
         except ValueError as e:
             raise serializers.ValidationError({"detail": str(e)}) from e
+
+    @transaction.atomic
+    def destroy(self, request, *args, **kwargs):
+        return super().destroy(request, *args, **kwargs)
 
     @action(detail=True, methods=["post"], url_path="confirm", permission_classes=[IsAdminUser])
     @transaction.atomic

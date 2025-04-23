@@ -9,6 +9,10 @@ from schedules.serializers import ExamScheduleSerializer
 
 @exam_schedule_schema_view
 class ExamScheduleViewSet(viewsets.ModelViewSet):
+    """
+    시험 일정 뷰셋
+    """
+
     queryset = ExamSchedule.objects.all()
     serializer_class = ExamScheduleSerializer
     permission_classes = [IsAuthenticated, IsAdminUserOrReadOnly]

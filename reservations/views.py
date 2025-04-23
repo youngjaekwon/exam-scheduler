@@ -13,6 +13,11 @@ from reservations.serializers import ReservationSerializer, ReservationUpdateSer
 
 @reservation_schema_view
 class ReservationViewSet(viewsets.ModelViewSet):
+    """
+    예약 뷰셋
+    - 예약 생성, 조회, 수정, 삭제, 확정 기능을 제공
+    """
+
     permission_classes = [IsAuthenticated, IsAdminOrOwnerWithEditableCondition]
     filterset_fields = ["schedule", "user", "is_confirmed"]
     ordering_fields = ["created_at", "expected_participants"]
@@ -40,6 +45,7 @@ class ReservationViewSet(viewsets.ModelViewSet):
         queryset = self.filter_queryset(self.get_queryset())
 
         if self.request.method not in SAFE_METHODS:
+            # 데이터 경합 방지를 위해 update, delete 시 select_for_update 사용
             queryset = queryset.select_for_update()
 
         obj = get_object_or_404(queryset, pk=self.kwargs["pk"])
@@ -51,24 +57,24 @@ class ReservationViewSet(viewsets.ModelViewSet):
 
     @transaction.atomic
     def perform_update(self, serializer):
-        instance = serializer.instance
+        reservation = serializer.instance
         new_expected_participants = serializer.validated_data.get(
-            "expected_participants", instance.expected_participants
+            "expected_participants", reservation.expected_participants
         )
 
-        if instance.expected_participants != new_expected_participants:
+        if reservation.expected_participants != new_expected_participants:
             try:
-                instance.modify_participants(new_expected_participants)
+                reservation.modify_participants(new_expected_participants)
             except ValueError as e:
                 raise serializers.ValidationError({"detail": str(e)}) from e
 
         super().perform_update(serializer)
 
     @transaction.atomic
-    def perform_destroy(self, instance):
+    def perform_destroy(self, reservation):
         try:
-            instance.cancel()
-            super().perform_destroy(instance)
+            reservation.cancel()
+            super().perform_destroy(reservation)
         except ValueError as e:
             raise serializers.ValidationError({"detail": str(e)}) from e
 

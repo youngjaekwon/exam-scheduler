@@ -24,10 +24,16 @@ class ReservationViewSet(viewsets.ModelViewSet):
         return ReservationSerializer
 
     def get_queryset(self):
-        qs = Reservation.objects.select_related("user", "schedule")
+        qs = Reservation.objects
+        if self.action in ["list", "retrieve"]:
+            # user와 schedule을 미리 가져오기 위해 select_related 사용
+            # 나머지 action에서는 모델 메소드 내부에서 schedule을 가져옴
+            qs = qs.select_related("user", "schedule")
+
         user = self.request.user
         if not user.is_staff:
             qs = qs.filter(user=user)
+
         return qs.all()
 
     def get_object(self):
